@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title id="pageTitle">Blog | Nizip Reklam & Tabela</title>
+<meta name="description" id="pageDesc" content="Nizip Reklam & Tabela blog yazısı">
+<link rel="icon" type="image/jpeg" href="../resim/nizipreklam.png">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Poppins,sans-serif;background:#070707;color:#fff}
+header{display:flex;justify-content:space-between;align-items:center;padding:18px 8%;background:rgba(0,0,0,.7)}
+.logo{color:#fff;font-size:28px;font-weight:800;text-decoration:none}
+.logo span{color:#39ff14}
+main{max-width:760px;margin:0 auto;padding:120px 6% 80px}
+h1{color:#fff;font-size:36px;margin-bottom:10px}
+.tarih{color:#00ff66;font-size:13px;margin-bottom:30px;display:block}
+img.kapak{width:100%;border-radius:12px;margin-bottom:30px;object-fit:cover;max-height:400px}
+.icerik{line-height:1.8;color:#ddd}
+.icerik h2{color:#00ff66;margin:30px 0 12px}
+.icerik p{margin-bottom:16px}
+.icerik ul{margin:0 0 16px 20px}
+.geri{color:#00ff66;text-decoration:none;display:inline-block;margin-bottom:30px}
+.hata{text-align:center;color:#888;padding:60px 0}
+</style>
+</head>
+<body>
+<header>
+<a href="../index.html" class="logo">NİZİP <span>REKLAM</span></a>
+<a href="../index.html" style="color:#00ff66;text-decoration:none">← Anasayfaya Dön</a>
+</header>
+<main>
+<a class="geri" href="index.html">← Tüm Yazılar</a>
+<div id="icerikAlani"></div>
+</main>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const slug = params.get('slug');
+
+fetch('../content/blog.json')
+  .then(r => r.json())
+  .then(data => {
+    const post = (data.posts || []).find(p => p.slug === slug && p.published !== false);
+    const alan = document.getElementById('icerikAlani');
+
+    if (!post) {
+      alan.innerHTML = '<div class="hata">Yazı bulunamadı.</div>';
+      return;
+    }
+
+    document.getElementById('pageTitle').textContent = post.title + ' | Nizip Reklam & Tabela';
+    document.getElementById('pageDesc').setAttribute('content', post.excerpt || '');
+
+    const tarih = post.date ? new Date(post.date).toLocaleDateString('tr-TR', {day:'numeric',month:'long',year:'numeric'}) : '';
+    const gövde = window.marked ? marked.parse(post.content || '') : (post.content || '');
+
+    alan.innerHTML = `
+      <h1>${post.title}</h1>
+      <span class="tarih">${tarih}</span>
+      ${post.image ? `<img class="kapak" src="../${post.image}" alt="${post.title}">` : ''}
+      <div class="icerik">${gövde}</div>
+    `;
+  })
+  .catch(() => {
+    document.getElementById('icerikAlani').innerHTML = '<div class="hata">Yazı yüklenirken bir sorun oluştu.</div>';
+  });
+</script>
+</body>
+</html>
